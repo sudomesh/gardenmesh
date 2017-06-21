@@ -1,0 +1,25 @@
+digraph G {
+  subgraph plant_box {
+    style=filled;
+    color=lightgrey;
+    node [style=filled,color=white];
+    vethn0 [ label="esp8266"];
+    "light" -> vethn0;
+    "moisture" -> vethn0;
+    "temp" -> vethn0;
+    label = "plantbox\nn0";
+  }
+
+  subgraph mesh_area_network {
+    node [style=filled];
+    vethn1 [ label="n600_0"];
+    "pi\nserver" -> vethn1;
+    label = "network namespace\nn1";
+    color=blue
+  }
+  "nano-beam\nbridge" -> vethn1;
+  "nano-beam\nbridge" -> "n600_1";
+  vethn0 -> "n600_1";
+  vethn1 -> "smartphone\nbrowser";
+
+}
