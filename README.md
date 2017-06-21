@@ -1,2 +1,2 @@
-# garden-mesh
+# garden mesh
 a mesh for your garden
