@@ -31,3 +31,13 @@ For development purposes, the current firmware is overloaded with lots packages 
  * WiFi
 
 To flash the firmware to your ESP8266, follow the guide on [this wiki](https://github.com/sudomesh/disaster-radio-nodemcu/wiki).
+
+# Using DHT sensor
+Connect the DHT sensor as shown in the following article https://learn.adafruit.com/dht/connecting-to-a-dhtxx-sensor except 
+use your imagination to replace the arduino with an ESP8266 dev board such as the NodeMCU v1 and connect
+the data output to the pin specified in getDHT function in the init.lua file (currently GPIO5/D1).
+After uploading the lua script via ```./upload.sh```, you can observe the temperature and humidity data being updated by connecting to 
+the ESP8266's serial feed with ```screen /dev/ttyUSB0 115200```.
+
+
+
