@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PlantDisaster</title>
+    <meta charset="utf-8">
+    <!--<link href="css/main.css" rel="stylesheet" type="text/css" />
+    <script src="bundle.js"></script>-->
+  </head>
+  <body>
+    <h1>Welcome to what is currently a PLANT DISASTER</h1>
+
+    <form id="chatForm" action="/chat" method="POST">
+      <div id="chat">
+      </div>
+      <input id="chatInput" type="text" name="msg" placeholder="Enter you name or alias" />
+      <script>
+        var c = document.getElementById('chatInput')
+        c.focus();
+        c.value = ''
+        c = null;
+      </script>
+    </form>
+
+    <p>
+      <input id="receiveButton" type="button" value="receive" />
+    </p>
+
+  </body>
+</html>
