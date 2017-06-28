@@ -1,4 +1,5 @@
 
+--[[ held over from disaster ping
 -- toggle LED
 function toggleLED() 
   gpio.mode(4, gpio.OUTPUT)
@@ -49,6 +50,7 @@ function listclients()
     clientlist:register(5000, tmr.ALARM_SINGLE, function() listclients() end)
     clientlist:start()
 end
+--]]
 
 -- retrieve sensor data
 function getDHT()
@@ -73,23 +75,71 @@ function getDHT()
         print( "DHT timed out." )
 
     end
+    m:publish("/temp", "temp", 0, 0, function(client) print("sent") end)
 end
+
+-- setup MQTT connection
+function connectMQTT()
+
+  print(wifi.sta.getip())
+
+  m:connect("127.0.0.1", 1883, 0, function(client)
+    print("connected")
+         -- subscribe topic with qos = 0
+     client:subscribe("/topic", 0, function(client) print("subscribe success") end)
+     -- publish a message with data = hello, QoS = 0, retain = 0
+     client:publish("/topic", "data", 0, 0, function(client) print("wrong sent") end)
+  end,
+  function(client, reason)
+    print("failed reason: " .. reason)
+  end)
+
+end
+
+ -- highest transmit power only available in 802.11b mode
+wifi.setphymode(wifi.PHYMODE_B)
+ 
+-- use only AP for now since STATIONAP wasn't working
+wifi.setmode(wifi.STATION)
+
+station_cfg={}
+station_cfg.ssid="Omni Commons"
+station_cfg.save=true
+station_cfg.auto=true
+
+wifi.sta.config(station_cfg)
+
+print(wifi.getmode())
+
+print(wifi.sta.getip())
+
+m = mqtt.Client("meshygardentool", 120)
+m:on("connect", function(client) print ("connected") end)
+m:on("offline", function(client) print ("offline") end)
+
+-- set up connection to MQTT broker
+conMQTT = tmr.create()
+conMQTT:register(10000, tmr.ALARM_SINGLE, connectMQTT) 
+conMQTT:start()
+
+-- initialize DHT sensor callback
+temp = tmr.create()
+temp:register(15000, tmr.ALARM_AUTO, getDHT)
+temp:start()
+
+
+--[[ held over from disaster ping
 
 -- initialize blinky listener
 blinky = tmr.create()
 blinky:register(5000, tmr.ALARM_AUTO, toggleLED)
 blinky:start()
 
--- setup wifi and initialize ap listener
-wifi.setmode(wifi.STATIONAP)
+-- initialize ap listener
 aplist = tmr.create()
 aplist:register(5000, tmr.ALARM_SINGLE, function() wifi.sta.getap(listap) end) 
 aplist:start()
-
--- initialize DHT sensor callback
-temp = tmr.create()
-temp:register(5000, tmr.ALARM_AUTO, getDHT)
-temp:start()
+--]]
 
 -- main function entry point
 --listclients()
