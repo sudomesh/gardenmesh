@@ -75,13 +75,13 @@ function getDHT()
         print( "DHT timed out." )
 
     end
+    print(wifi.sta.getip())
+    -- add if condition
     m:publish("/temp", "temp", 0, 0, function(client) print("sent") end)
 end
 
 -- setup MQTT connection
 function connectMQTT()
-
-  print(wifi.sta.getip())
 
   m:connect("127.0.0.1", 1883, 0, function(client)
     print("connected")
@@ -104,23 +104,29 @@ wifi.setmode(wifi.STATION)
 
 station_cfg={}
 station_cfg.ssid="Omni Commons"
-station_cfg.save=true
+--station_cfg.save=true
 station_cfg.auto=true
 
 wifi.sta.config(station_cfg)
-
-print(wifi.getmode())
-
-print(wifi.sta.getip())
 
 m = mqtt.Client("meshygardentool", 120)
 m:on("connect", function(client) print ("connected") end)
 m:on("offline", function(client) print ("offline") end)
 
+wifi.eventmon.register(wifi.eventmon.STA_CONNECTED, function(T)
+
+  print("\n\tSTA - CONNECTED".."\n\tSSID: "..T.SSID.."\n\tBSSID: "..
+  T.BSSID.."\n\tChannel: "..T.channel)
+
+ 
+  connectMQTT()
+  
+  end)
+
 -- set up connection to MQTT broker
-conMQTT = tmr.create()
+--[[conMQTT = tmr.create()
 conMQTT:register(10000, tmr.ALARM_SINGLE, connectMQTT) 
-conMQTT:start()
+conMQTT:start()--]]
 
 -- initialize DHT sensor callback
 temp = tmr.create()
