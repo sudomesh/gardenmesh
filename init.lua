@@ -1,57 +1,3 @@
-
---[[ held over from disaster ping
--- toggle LED
-function toggleLED() 
-  gpio.mode(4, gpio.OUTPUT)
-  gpio.write(4, gpio.read(4) == gpio.HIGH and gpio.LOW or gpio.HIGH)
-end
-
--- hold LED high
-function holdLED()
-  gpio.mode(4, gpio.OUTPUT)
-  gpio.write(4, gpio.HIGH)  
-end
-
--- get all ssids
-function listap(t)
-    blinky:unregister()
-    for k,v in pairs(t) do
-	if string.find(k, "ESP*") then 
-	  local authmode, rssi, bssid, channel = string.match(v, "([^,]+),([^,]+),([^,]+),([^,]+)")
-          print(k.." : "..rssi)
-          signal = -1*rssi < 20 and 20 or -1*rssi
-	  blinky:register(signal*signal/2, tmr.ALARM_AUTO, toggleLED)
-	  blinky:start()
-	--else 
-	  --print("no ping, no pong")
-        end
-    end
-    aplist:register(5000, tmr.ALARM_SINGLE, function() wifi.sta.getap(listap) end) 
-    aplist:start()
-end
-
--- get all connected clients
-function listclients()
-    clientcount = 0
-    for mac,ip in pairs(wifi.ap.getclient()) do
-       print(mac,ip)
-       clientcount = clientcount + 1 -- increment count of clients (future-proofing?)
-    end
-    if (clientcount > 0) then
-      blinky:unregister()
-      aplist:unregister()
-      blinky:register(5000, tmr.ALARM_AUTO, holdLED)
-      -- print("somebody ponged")
-    else
-      wifi.sta.getap(listap) 
-      -- print("nobody ponged") 
-    end
-    clientlist = tmr.create()
-    clientlist:register(5000, tmr.ALARM_SINGLE, function() listclients() end)
-    clientlist:start()
-end
---]]
-
 -- retrieve sensor data
 function getDHT()
 
@@ -77,18 +23,25 @@ function getDHT()
     end
     print(wifi.sta.getip())
     -- add if condition
-    m:publish("/temp", "temp", 0, 0, function(client) print("sent") end)
+    m:publish("/temp", "data", 0, 0, function(client) print("sent") end)
 end
 
 -- setup MQTT connection
 function connectMQTT()
 
-  m:connect("127.0.0.1", 1883, 0, function(client)
+  print(wifi.sta.getip())
+  m:connect("100.64.66.19", 1883, 0, function(client)
     print("connected")
          -- subscribe topic with qos = 0
-     client:subscribe("/topic", 0, function(client) print("subscribe success") end)
+     --client:subscribe("/garden", 0, function(client) print("subscribe success") end)
      -- publish a message with data = hello, QoS = 0, retain = 0
-     client:publish("/topic", "data", 0, 0, function(client) print("wrong sent") end)
+     client:publish("/plantbox01", "connected", 0, 0, function(client) print("initialized mqtt") end)
+
+    -- initialize DHT sensor timer
+    temp = tmr.create()
+    temp:register(15000, tmr.ALARM_AUTO, getDHT)
+    temp:start()
+
   end,
   function(client, reason)
     print("failed reason: " .. reason)
@@ -96,57 +49,49 @@ function connectMQTT()
 
 end
 
- -- highest transmit power only available in 802.11b mode
-wifi.setphymode(wifi.PHYMODE_B)
+
+function setupWIFI()
+
+  -- highest transmit power only available in 802.11b mode
+  wifi.setphymode(wifi.PHYMODE_B)
  
--- use only AP for now since STATIONAP wasn't working
-wifi.setmode(wifi.STATION)
+  -- use only AP for now since STATIONAP wasn't working
+  wifi.setmode(wifi.STATION)
 
-station_cfg={}
-station_cfg.ssid="Omni Commons"
---station_cfg.save=true
-station_cfg.auto=true
+  -- start WiFi auto connect (may not connect immeadiately 
+  station_cfg={}
+  station_cfg.ssid="Omni Commons"
+  station_cfg.save=true
+  station_cfg.auto=true
 
-wifi.sta.config(station_cfg)
+  wifi.sta.config(station_cfg)
 
-m = mqtt.Client("meshygardentool", 120)
-m:on("connect", function(client) print ("connected") end)
-m:on("offline", function(client) print ("offline") end)
+end
 
-wifi.eventmon.register(wifi.eventmon.STA_CONNECTED, function(T)
 
-  print("\n\tSTA - CONNECTED".."\n\tSSID: "..T.SSID.."\n\tBSSID: "..
-  T.BSSID.."\n\tChannel: "..T.channel)
+function  startMQTT()
 
- 
-  connectMQTT()
+  m = mqtt.Client("plantbox01", 120)
+  m:on("connect", function(client) print ("connected") end)
+  m:on("offline", function(client) print ("offline") end)
+  
+  -- start monitor for WiFi connection 
+  wifi.eventmon.register(wifi.eventmon.STA_CONNECTED, function(T)
+
+    print("\n\tSTA - CONNECTED".."\n\tSSID: "..T.SSID.."\n\tBSSID: "..
+    T.BSSID.."\n\tChannel: "..T.channel)
+
+    -- set up connection to MQTT broker 5s from now (to allow time to get IP)
+    conMQTT = tmr.create()
+    conMQTT:register(5000, tmr.ALARM_SINGLE, connectMQTT) 
+    conMQTT:start()
   
   end)
-
--- set up connection to MQTT broker
---[[conMQTT = tmr.create()
-conMQTT:register(10000, tmr.ALARM_SINGLE, connectMQTT) 
-conMQTT:start()--]]
-
--- initialize DHT sensor callback
-temp = tmr.create()
-temp:register(15000, tmr.ALARM_AUTO, getDHT)
-temp:start()
+end
 
 
---[[ held over from disaster ping
-
--- initialize blinky listener
-blinky = tmr.create()
-blinky:register(5000, tmr.ALARM_AUTO, toggleLED)
-blinky:start()
-
--- initialize ap listener
-aplist = tmr.create()
-aplist:register(5000, tmr.ALARM_SINGLE, function() wifi.sta.getap(listap) end) 
-aplist:start()
---]]
+setupWIFI()
 
 -- main function entry point
---listclients()
+startMQTT()
 
