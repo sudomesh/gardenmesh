@@ -44,7 +44,23 @@ DHT Temperature:21.500;Humidity:58.000
 ```
 
 It can now also talk to an MQTT broker such as the [meshygardentoolshed](https://github.com/sudomesh/meshygardentoolshed) and say things
-like "hello" and "Hey, my temperature is 21.5 degrees C".
+like "hello" and "Hey, my temperature is 21.5 degrees C".  
 
+If using the meshygardentoolbox, the mqtt messages will be collected as tab delimited ASCII codes. Note: plantbox01 is the client ID, it is unclear where the topic is used by the mqtt broker. 
 
+```
+client connected plantbox01
+Published plantbox01
+Published plantbox01
+Published <Buffer 63 6f 6e 6e 65 63 74 65 64>
+Published <Buffer 74 65 6d 70 09 32 36 2e 30 09 43 0a>
+Published <Buffer 74 65 6d 70 09 32 36 2e 30 09 43 0a>
+Published <Buffer 74 65 6d 70 09 32 36 2e 30 09 43 0a>
+Published <Buffer 74 65 6d 70 09 32 36 2e 30 09 43 0a>
+Published <Buffer 74 65 6d 70 09 33 31 2e 33 30 30 09 43 0a>
+Published <Buffer 74 65 6d 70 09 33 32 2e 36 30 30 09 43 0a>
+Published <Buffer 74 65 6d 70 09 33 31 2e 33 30 30 09 43 0a>
+```
+
+If you happen to not be able to remember your ASCII codes off hand, ```74 65 6d 70 09 33 31 2e 33 30 30 09 43 0a``` corresponds to the following message, ```temp	31.300	C```
 

@@ -21,9 +21,9 @@ function getDHT()
         print( "DHT timed out." )
 
     end
-    print(wifi.sta.getip())
-    -- add if condition
-    m:publish("/temp", "data", 0, 0, function(client) print("sent") end)
+    --print(wifi.sta.getip())
+    tempdata = "temp\t" .. temp .. "." .. temp_dec .. "\tC\n"
+    m:publish("/temp", tempdata , 0, 0, function(client) print("sent") end)
 end
 
 -- setup MQTT connection
