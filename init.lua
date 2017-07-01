@@ -5,9 +5,10 @@ function getDHT()
     status, temp, humi, temp_dec, humi_dec = dht.read(pin)
 
     if status == dht.OK then
-
+        DHTseq = DHTseq + 1
         -- Integer firmware using this example
-        print(string.format("DHT Temperature:%d.%03d;Humidity:%d.%03d\r\n",
+        print(string.format("Seq %d - DHT Temperature:%d.%03d;Humidity:%d.%03d\r\n",
+             DHTseq,
              math.floor(temp),
              temp_dec,
              math.floor(humi),
@@ -22,21 +23,19 @@ function getDHT()
 
     end
     --print(wifi.sta.getip())
-    tempdata = "temp\t" .. temp .. "." .. temp_dec .. "\tC\n"
+    tempdata = "temp\t".. DHTseq .. "\t" .. temp .. "." .. temp_dec .. "\tC\n"
     m:publish("/temp", tempdata , 0, 0, function(client) print("sent") end)
 end
 
 -- setup MQTT connection
 function connectMQTT()
-
   print(wifi.sta.getip())
   m:connect("100.64.66.19", 1883, 0, function(client)
     print("connected")
          -- subscribe topic with qos = 0
      --client:subscribe("/garden", 0, function(client) print("subscribe success") end)
      -- publish a message with data = hello, QoS = 0, retain = 0
-     client:publish("/plantbox01", "connected", 0, 0, function(client) print("initialized mqtt") end)
-
+    client:publish("/plantbox01", "connected", 0, 0, function(client) print("initialized mqtt") end)
     -- initialize DHT sensor timer
     temp = tmr.create()
     temp:register(15000, tmr.ALARM_AUTO, getDHT)
@@ -89,6 +88,8 @@ function  startMQTT()
   end)
 end
 
+
+DHTseq = 0
 
 setupWIFI()
 
