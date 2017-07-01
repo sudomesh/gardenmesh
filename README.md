@@ -5,7 +5,7 @@ The idea being as follows:
 <img src="https://github.com/sudomesh/gardenmesh/raw/master/disaster-plant.dot.png">  
 Current necessary components:
  * ESP8266 flashed with NodeMCU firmware
- * Variety of enviromental sensors 
+ * Variety of enviromental sensors (currently DHT temperature/humidity sensor and capacitive soil moisture sensor)
  * Lua script to collect data from sensors and transmit it to MQTT broker
  * BabelD routing on OpenWrt routers
  * RaspberryPi to act as MQTT broker and HTTP server for hosting webpage with data
@@ -46,22 +46,25 @@ Seq 7 - DHT Temperature:21.500;Humidity:58.000
 It can now also talk to an MQTT broker such as the [meshygardentoolshed](https://github.com/sudomesh/meshygardentoolshed) and say things
 like "hello" and "Hey, my temperature is 21.5 degrees C".  
 
-If using the meshygardentoolbox, the mqtt messages will be collected as tab delimited ASCII codes terminated with a return character. Note: plantbox01 is the client ID and the topic is "temp" (i.e. the first entry of the message). 
+If using the meshygardentoolbox, the mqtt messages will be collected as tab delimited ASCII codes terminated with a return character. Note: plantbox01 is the client ID and the topic doesn't seemed to be used anywhere? 
 
 ```
 client connected plantbox01
 Published plantbox01
 Published plantbox01
 Published <Buffer 63 6f 6e 6e 65 63 74 65 64>
-Published <Buffer 74 65 6d 70 09 31 09 32 35 2e 38 30 30 09 43 0a>
-Published <Buffer 74 65 6d 70 09 32 09 32 35 2e 39 30 30 09 43 0a>
-Published <Buffer 74 65 6d 70 09 33 09 32 35 2e 38 30 30 09 43 0a>
-Published <Buffer 74 65 6d 70 09 34 09 32 35 2e 38 30 30 09 43 0a>
-Published <Buffer 74 65 6d 70 09 35 09 32 35 2e 38 30 30 09 43 0a>
-Published <Buffer 74 65 6d 70 09 36 09 32 35 2e 37 30 30 09 43 0a>
-Published <Buffer 74 65 6d 70 09 37 09 33 31 2e 38 30 30 09 43 0a>
-Published <Buffer 74 65 6d 70 09 38 09 33 30 2e 37 30 30 09 43 0a>
+Published <Buffer 74 65 6d 70 09 31 09 32 36 2e 32 30 30 09 43 0a>
+Published <Buffer 68 75 6d 69 09 31 09 34 30 2e 36 30 30 09 70 63 74 0a>
+Published <Buffer 73 6f 69 6c 09 31 09 34 31 32 09 70 63 74 0a>
+Published <Buffer 74 65 6d 70 09 32 09 32 36 2e 30 09 43 0a>
+Published <Buffer 68 75 6d 69 09 32 09 34 30 2e 33 30 30 09 70 63 74 0a>
+Published <Buffer 73 6f 69 6c 09 32 09 34 31 32 09 70 63 74 0a>
+Published <Buffer 74 65 6d 70 09 33 09 32 35 2e 39 30 30 09 43 0a>
+Published <Buffer 68 75 6d 69 09 33 09 34 31 2e 30 09 70 63 74 0a>
+Published <Buffer 73 6f 69 6c 09 33 09 34 31 32 09 70 63 74 0a>
 ```
 
 If you happen to not be able to remember your ASCII codes off hand, ```74 65 6d 70 09 33 31 2e 33 30 30 09 43 0a``` corresponds to the following message, ```temp (tab) 8 (tab) 30.700 (tab) C (EOL)```
+
+It now also transmits humidity as a precentage collected by a DHT sensor and soil moisture as a percentage collected by a capacitive sensor over the ESP8266s analog pin. Convert the above sample to ASCII characters to see example data.
 
