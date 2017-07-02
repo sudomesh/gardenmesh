@@ -2,9 +2,8 @@
 a mesh for your garden
 
 The idea being as follows:  
-<img src="https://github.com/sudomesh/gardenmesh/raw/master/disaster-plant.dot.png"> 
-and prototype in action on 1 July 2017:
-<img src="https://github.com/sudomesh/gardenmesh/raw/master/tomato-plant.png">  
+<img src="https://github.com/sudomesh/gardenmesh/raw/master/disaster-plant.dot.png" width="50%"> <img src="https://github.com/sudomesh/gardenmesh/raw/master/tomato-plant.png" width="50%">  
+
 Current necessary components:
  * ESP8266 flashed with NodeMCU firmware
  * Variety of enviromental sensors (currently DHT temperature/humidity sensor and capacitive soil moisture sensor)
