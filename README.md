@@ -2,7 +2,9 @@
 a mesh for your garden
 
 The idea being as follows:  
-<img src="https://github.com/sudomesh/gardenmesh/raw/master/disaster-plant.dot.png">  
+<img src="https://github.com/sudomesh/gardenmesh/raw/master/disaster-plant.dot.png"> 
+and prototype in action on 1 July 2017:
+<img src="https://github.com/sudomesh/gardenmesh/raw/master/tomato-plant.png">  
 Current necessary components:
  * ESP8266 flashed with NodeMCU firmware
  * Variety of enviromental sensors (currently DHT temperature/humidity sensor and capacitive soil moisture sensor)
@@ -67,4 +69,5 @@ Published <Buffer 73 6f 69 6c 09 33 09 34 31 32 09 70 63 74 0a>
 If you happen to not be able to remember your ASCII codes off hand, ```74 65 6d 70 09 33 31 2e 33 30 30 09 43 0a``` corresponds to the following message, ```temp (tab) 8 (tab) 30.700 (tab) C (EOL)```
 
 It now also transmits humidity as a precentage collected by a DHT sensor and soil moisture as a percentage collected by a capacitive sensor over the ESP8266s analog pin. Convert the above sample to ASCII characters to see example data.
+
 
