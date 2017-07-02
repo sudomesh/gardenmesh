@@ -2,7 +2,12 @@
 a mesh for your garden
 
 The idea being as follows:  
-<img src="https://github.com/sudomesh/gardenmesh/raw/master/disaster-plant.dot.png" width="50%"> <img src="https://github.com/sudomesh/gardenmesh/raw/master/tomato-plant.png" width="50%">  
+
+<table><tr>
+<td><img src="https://github.com/sudomesh/gardenmesh/raw/master/disaster-plant.dot.png"></td>
+<td><img src="https://github.com/sudomesh/gardenmesh/raw/master/tomato-plant.png"></td>
+</tr>
+</table>
 
 Current necessary components:
  * ESP8266 flashed with NodeMCU firmware
