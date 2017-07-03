@@ -7,9 +7,14 @@ function getSOIL()
              SOILseq,
              val
         ))
-    soildata = "soil\t".. SOILseq .. "\t" .. val .. "\tpct\n"
+    soildata = "soil\t".. SOILseq .. "\t" .. val .. "\tpct\t" .. wifi.sta.getmac() .. "\n"
     m:publish(topic, soildata , 0, 0, function(client) print("sent data") end)
 
+    if SOILseq == 6 then
+        reset = tmr.create()
+        reset:register(15000, tmr.ALARM_SINGLE, function() node.restart() end)
+        reset:start()
+    end
 
 end
 
@@ -37,8 +42,8 @@ function getDHT()
     end
     
     -- format message data
-    tempdata = "temp\t".. DHTseq .. "\t" .. temp .. "." .. temp_dec .. "\tC\n"
-    humidata = "humi\t".. DHTseq .. "\t" .. humi .. "." .. humi_dec .. "\tpct\n"
+    tempdata = "temp\t".. DHTseq .. "\t" .. temp .. "." .. temp_dec .. "\tC\t" .. wifi.sta.getmac() .. "\n"
+    humidata = "humi\t".. DHTseq .. "\t" .. humi .. "." .. humi_dec .. "\tpct\t" .. wifi.sta.getmac() .. "\n"
 
     -- pub temp and humidity data to mqtt broker
     m:publish(topic, tempdata , 0, 0, function(client) print("sent data") end)
@@ -56,13 +61,13 @@ function connectMQTT()
     -- publish an initialization message (not necessary?)
     client:publish("/plantbox01", "connected", 0, 0, function(client) print("initialized MQTT") end)
 
-    -- initialize sensors to collect and transmit data every 15s
+    -- initialize sensors to collect and transmit data every 5mins
     temp = tmr.create()
-    temp:register(15000, tmr.ALARM_AUTO, getDHT)
+    temp:register(collectFREQ, tmr.ALARM_AUTO, getDHT)
     temp:start()
     
     soil = tmr.create()
-    soil:register(15000, tmr.ALARM_AUTO, getSOIL)
+    soil:register(collectFREQ, tmr.ALARM_AUTO, getSOIL)
     soil:start()
 
   end,
@@ -94,7 +99,7 @@ end
 
 function  startMQTT()
 
-  m = mqtt.Client("plantbox01", 120)
+  m = mqtt.Client(clientID, 120)
   m:on("connect", function(client) print ("connected") end)
   m:on("offline", function(client) print ("offline") end)
   
@@ -117,8 +122,10 @@ DHTseq = 0
 DHTpin = 1 -- corresponds to GPIO5 or D1 on NodeMCU and D1mini board
 SOILseq = 0
 SOILpin = 0 -- this always will be zero on ESP8266
+collectFREQ = 300000
 networkSSID = "Omni Commons"
-brokerIP = "100.64.66.19"
+brokerIP = "peoplesopen.net" --"100.64.66.19"
+clientID = "plantbox01"
 topic = "gardenmesh"
 
 setupWIFI()
