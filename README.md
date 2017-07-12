@@ -1,5 +1,5 @@
 # garden mesh
-a mesh for your garden
+a mesh for your garden (for details like list of components, please visit the [wiki](../../wiki))
 
 The idea being as follows:  
 
