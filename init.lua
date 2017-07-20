@@ -1,4 +1,26 @@
 -- retrieve sensor data
+function deepSLEEP()
+    
+    print("going to sleep for a few minutes")
+    if ( m:close() ) then
+        print("MQTT connection closed")
+        wifi.sta.disconnect()
+        --sleep = tmr.create()
+        --sleep:register(2000, tmr.ALARM_SINGLE, function() 
+        node.dsleep(300000000)
+        --end)
+        --sleep:start()
+   end
+
+end
+
+function collectDATA()
+
+    getDHT() 
+
+end
+
+
 function getSOIL()
     -- should all sensor collection/transmission just be rolled into a single timer function?
     val = adc.read(SOILpin)
@@ -10,11 +32,11 @@ function getSOIL()
     soildata = "soil\t".. SOILseq .. "\t" .. val .. "\tpct\t" .. wifi.sta.getmac() .. "\n"
     m:publish(topic, soildata , 0, 0, function(client) print("sent data") end)
 
-    if SOILseq == 6 then
+    --[[if SOILseq == 6 then
         reset = tmr.create()
         reset:register(15000, tmr.ALARM_SINGLE, function() node.restart() end)
         reset:start()
-    end
+    end--]]
 
 end
 
@@ -46,8 +68,8 @@ function getDHT()
     humidata = "humi\t".. DHTseq .. "\t" .. humi .. "." .. humi_dec .. "\tpct\t" .. wifi.sta.getmac() .. "\n"
 
     -- pub temp and humidity data to mqtt broker
-    m:publish(topic, tempdata , 0, 0, function(client) print("sent data") end)
-    m:publish(topic, humidata , 0, 0, function(client) print("sent data") end)
+    m:publish(topic, tempdata , 0, 0, deepSLEEP)
+    --m:publish(topic, humidata , 0, 0, function(client) print("sent data") end)
 
 end
 
@@ -62,13 +84,18 @@ function connectMQTT()
     client:publish("/plantbox01", "connected", 0, 0, function(client) print("initialized MQTT") end)
 
     -- initialize sensors to collect and transmit data every 5mins
-    temp = tmr.create()
+    
+    data = tmr.create()
+    data:register(2000, tmr.ALARM_SINGLE, collectDATA)
+    data:start()
+    
+    --[[temp = tmr.create()
     temp:register(collectFREQ, tmr.ALARM_AUTO, getDHT)
     temp:start()
     
     soil = tmr.create()
     soil:register(collectFREQ, tmr.ALARM_AUTO, getSOIL)
-    soil:start()
+    soil:start()--]]
 
   end,
   function(client, reason)
@@ -127,6 +154,8 @@ networkSSID = "Omni Commons"
 brokerIP = "peoplesopen.net" --"100.64.66.19"
 clientID = "plantbox01"
 topic = "gardenmesh"
+--gpio.mode(0, gpio.OUTPUT)
+--gpio.write(0, gpio.HIGH)
 
 setupWIFI()
 
