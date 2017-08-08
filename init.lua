@@ -2,10 +2,10 @@ function collectDATA()
 
     -- add if statements in case sensor doesn't exist
     message = ""
-    message = message .. getDHT() .. "\t"
-    message = message .. getSOIL() .. "\t" 
+    message = message .. getDHT() 
+    message = message .. getSOIL() 
     --getLIGHT() 
-    message = message .. node.chipid() .. "\n"
+    message = message .. node.chipid() 
     -- packaged like so:
     -- "temp \t value \t unit \t humi \t value \t unit \t ... chipID \n"
     return sendDATA(message)
@@ -24,11 +24,7 @@ function deepSLEEP()
     if ( m:close() ) then
         print("MQTT connection closed")
         wifi.sta.disconnect()
-        --sleep = tmr.create()
-        --sleep:register(2000, tmr.ALARM_SINGLE, function() 
         node.dsleep(300000000)
-        --end)
-        --sleep:start()
    end
 
 end
@@ -36,45 +32,47 @@ end
 
 function getDHT()
 
-    status, temp, humi, temp_dec, humi_dec = dht.read(DHTpin)
 
-    if status == dht.OK then
-        -- integer firmware being used
-        print(string.format("DHT Temperature: %d.%03d C; Humidity: %d.%03d pct;\r",
-             math.floor(temp),
-             temp_dec,
-             math.floor(humi),
-             humi_dec
-        ))
+    for i=1, 10 do
 
-    elseif status == dht.ERROR_CHECKSUM then
-        print( "DHT Checksum error." )
+        status, temp, humi, temp_dec, humi_dec = dht.read(i)
 
-    elseif status == dht.ERROR_TIMEOUT then
-        print( "DHT timed out." )
+        if status == dht.OK then
 
+            -- integer firmware being used
+            print(string.format("DHT Temperature: %d.%03d C; Humidity: %d.%03d pct;\r",
+                 math.floor(temp),
+                 temp_dec,
+                 math.floor(humi),
+                 humi_dec
+            ))
+
+            -- format message data
+            tempdata = "temp ".. temp .. "." .. temp_dec .. " C"
+            humidata = "humi ".. humi .. "." .. humi_dec .. " pct"
+
+            return tempdata .. "\t" .. humidata .. "\t"
+
+        elseif status == dht.ERROR_CHECKSUM then
+            print( "DHT Checksum error." )
+
+        elseif status == dht.ERROR_TIMEOUT then
+            print( "DHT timed out." )
+
+        end
+        
     end
-    
-    -- format message data
-    tempdata = "temp\t".. temp .. "." .. temp_dec .. "\tC"
-    humidata = "humi\t".. humi .. "." .. humi_dec .. "\tpct"
-    return tempdata .. "\t" .. humidata
-
-    -- pub temp and humidity data to mqtt broker
-    --m:publish(topic, tempdata , 0, 0, deepSLEEP)
-    --m:publish(topic, humidata , 0, 0, function(client) print("sent data") end)
 
 end
 
 function getSOIL()
-    -- should all sensor collection/transmission just be rolled into a single timer function?
+
     val = adc.read(SOILpin)
     print(string.format("Soil Moisture: %d pct\r",
              val
         ))
-    soildata = "soil\t" .. val .. "\tpct"
+    soildata = "soil " .. val .. " pct\t"
     return soildata
-    --m:publish(topic, soildata , 0, 0, function(client) print("sent data") end)
 
 end
 
