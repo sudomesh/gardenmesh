@@ -74,5 +74,6 @@ It now also transmits humidity as a precentage collected by a DHT sensor and soi
 
 The data is currently packaged as json like so:
 ```
-{"data":{"humi":["humi","41.800","pct"],"temp":["temp","28.600","C"],"soil":["soil",759,"pct"]},"source":11605683}
+{"data":{"humi":{"value":"58.500","type":"humi","unit":"pct"},"temp":{"value":"22.600","type":"temp","unit":"C"},"soil":{"value":757,"type":"soil","unit":"pct"}},"source":11605683}
+
 ```

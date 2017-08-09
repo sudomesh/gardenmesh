@@ -40,10 +40,13 @@ end
 
 function getDHT()
 
+    tempdata = {}
+    humidata = {}
+
     for i=1, 10 do
 
         status, temp, humi, temp_dec, humi_dec = dht.read(i)
-
+        
         if status == dht.OK then
 
             -- integer firmware being used
@@ -55,8 +58,13 @@ function getDHT()
             ))
 
             -- format message data
-            tempdata = { "temp", temp .. "." .. temp_dec, "C" }
-            humidata = { "humi", humi .. "." .. humi_dec, "pct" }
+            tempdata["type"] = "temp"
+            tempdata["value"]= temp .. "." .. temp_dec
+            tempdata["unit"]= "C" 
+
+            humidata["type"] = "humi"
+            humidata["value"]= humi .. "." .. humi_dec
+            humidata["unit"]= "pct" 
 
             return tempdata, humidata
 
@@ -78,7 +86,10 @@ function getSOIL()
     print(string.format("Soil Moisture: %d pct\r",
              val
         ))
-    soildata = { "soil", val, "pct" }
+    soildata = {}
+    soildata["type"] = "soil"
+    soildata["value"]= val 
+    soildata["unit"]= "pct" 
     return soildata
 
 end
