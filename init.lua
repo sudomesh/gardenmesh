@@ -1,20 +1,28 @@
 function collectDATA()
 
     -- add if statements in case sensor doesn't exist
-    message = ""
-    message = message .. getDHT() 
-    message = message .. getSOIL() 
+    table = {}
+    table["data"] = {}
+    table["data"]["temp"], table["data"]["humi"] = getDHT()
+    table["data"]["soil"] = getSOIL() 
     --getLIGHT() 
-    message = message .. node.chipid() 
+    table["source"] = node.chipid() 
     -- packaged like so:
     -- "temp \t value \t unit \t humi \t value \t unit \t ... chipID \n"
-    return sendDATA(message)
+
+    ok, json = pcall(sjson.encode, table)
+    if ok then
+        print(json)
+        return sendDATA(json)
+    else
+        print("failed")
+    end
 
 end
 
-function sendDATA(data)
+function sendDATA(message)
 
-    m:publish(topic, data , 0, 0, deepSLEEP)
+    m:publish(topic, message , 0, 0, deepSLEEP)
 
 end
 
@@ -32,7 +40,6 @@ end
 
 function getDHT()
 
-
     for i=1, 10 do
 
         status, temp, humi, temp_dec, humi_dec = dht.read(i)
@@ -48,10 +55,10 @@ function getDHT()
             ))
 
             -- format message data
-            tempdata = "temp ".. temp .. "." .. temp_dec .. " C"
-            humidata = "humi ".. humi .. "." .. humi_dec .. " pct"
+            tempdata = { "temp", temp .. "." .. temp_dec, "C" }
+            humidata = { "humi", humi .. "." .. humi_dec, "pct" }
 
-            return tempdata .. "\t" .. humidata .. "\t"
+            return tempdata, humidata
 
         elseif status == dht.ERROR_CHECKSUM then
             print( "DHT Checksum error." )
@@ -71,7 +78,7 @@ function getSOIL()
     print(string.format("Soil Moisture: %d pct\r",
              val
         ))
-    soildata = "soil " .. val .. " pct\t"
+    soildata = { "soil", val, "pct" }
     return soildata
 
 end

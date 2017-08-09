@@ -70,8 +70,9 @@ Published <Buffer 68 75 6d 69 09 33 09 34 31 2e 30 09 70 63 74 0a>
 Published <Buffer 73 6f 69 6c 09 33 09 34 31 32 09 70 63 74 0a>
 ```
 
-If you happen to not be able to remember your ASCII codes off hand, ```74 65 6d 70 09 33 31 2e 33 30 30 09 43 0a``` corresponds to the following message, ```temp (tab) 8 (tab) 30.700 (tab) C (EOL)```
-
 It now also transmits humidity as a precentage collected by a DHT sensor and soil moisture as a percentage collected by a capacitive sensor over the ESP8266s analog pin. Convert the above sample to ASCII characters to see example data.
 
-
+The data is currently packaged as json like so:
+```
+{"data":{"humi":["humi","41.800","pct"],"temp":["temp","28.600","C"],"soil":["soil",759,"pct"]},"source":11605683}
+```
