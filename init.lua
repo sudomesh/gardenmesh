@@ -22,7 +22,7 @@ end
 
 function sendDATA(message)
 
-    m:publish(topic, message , 0, 0, deepSLEEP)
+    m:publish(topic, message , 0, 0, function() print("published!") end)--, deepSLEEP)
 
 end
 
@@ -165,8 +165,13 @@ topic = "gardenmesh"
 --gpio.mode(0, gpio.OUTPUT)
 --gpio.write(0, gpio.HIGH)
 
-setupWIFI()
+--setupWIFI()
 
 -- main function entry point
-startMQTT()
+--startMQTT()
+wifi.setmode(wifi.SOFTAP)
+print(wifi.ap.getip())
+print("remote upload SUCCEEDS!")
+
+dofile("terminal.lua")
 
