@@ -1,6 +1,8 @@
 # garden mesh
 a mesh for your garden (for details like list of components, please visit the [wiki](../../wiki))
 
+Also see https://peoplesopen.net/gardenmesh .
+
 The idea being as follows:  
 
 <table><tr>
